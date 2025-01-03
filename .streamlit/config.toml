@@ -1,0 +1,6 @@
+[theme]
+base = "dark"                  # Options: "light" (default) or "dark"
+primaryColor = "#1E88E5"       # Primary color
+backgroundColor = "#0E1117"    # Color for app background
+textColor = "#FFFFFF"          # Color for text
+font = "sans serif"
