@@ -1,84 +1,157 @@
+from typing import List, Dict
 import streamlit as st
 
-st.set_page_config(page_title="Oura Dashboard", layout="wide")
+# Configuration constants
+PAGE_TITLE = "Oura Dashboard"
+PAGE_HEADER = "Personal Health Analytics"
+PAGE_DESCRIPTION = "Welcome to your personal health dashboard. Track your sleep, activity, and readiness metrics from your Oura Ring."
 
-st.title("Personal Health Analytics")
+# Sample data - In real app, this would come from a data service
+SAMPLE_DATA = {
+    "sleep": {
+        "total_time": "7h 23m",
+        "score": "85",
+        "deep_sleep": "1h 45m",
+        "rem_sleep": "1h 30m",
+        "latency": "12 min",
+        "efficiency": "92%",
+        "duration_history": [7.5, 6.8, 8.1, 7.2, 7.4, 6.9, 7.8],
+        "score_history": [85, 82, 88, 79, 86, 83, 87]
+    },
+    "activity": {
+        "steps": "8,742",
+        "score": "78",
+        "calories": "2,450",
+        "walking_equiv": "6.2 km",
+        "training_freq": "4/7 days",
+        "movement": "85%",
+        "steps_history": [8742, 10123, 7865, 9234, 8654, 11234, 9876],
+        "score_history": [78, 82, 75, 80, 77, 85, 79]
+    },
+    "readiness": {
+        "hrv": "45 ms",
+        "resting_hr": "62 bpm",
+        "temp_deviation": "+0.2°C",
+        "recovery_index": "88",
+        "body_battery": "75%",
+        "respiratory_rate": "14 rpm",
+        "hrv_history": [45, 48, 42, 46, 44, 47, 43],
+        "hr_history": [62, 60, 63, 61, 64, 62, 61]
+    }
+}
 
-st.write("Welcome to your personal health dashboard. Track your sleep, activity, and readiness metrics from your Oura Ring.")
+def setup_page() -> None:
+    """Configure initial page settings."""
+    st.set_page_config(page_title=PAGE_TITLE, layout="wide")
+    st.title(PAGE_HEADER)
+    st.write(PAGE_DESCRIPTION)
+    st.markdown("---")
 
-st.markdown("---")
+def display_metrics_column(metrics: Dict[str, str]) -> None:
+    """Display a column of metrics.
+    
+    Args:
+        metrics: Dictionary of metric labels and values
+    """
+    for label, value in metrics.items():
+        st.metric(label, value)
 
-# Create tabs for different graph categories
-tab1, tab2, tab3 = st.tabs(["Sleep", "Activity", "Readiness"])
-
-with tab1:
+def display_sleep_tab(data: Dict) -> None:
+    """Render the sleep metrics tab."""
     st.subheader("Sleep Metrics")
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric("Total Sleep Time", "7h 23m")
+        st.metric("Total Sleep Time", data["total_time"])
         st.line_chart(
-            {"Sleep Duration": [7.5, 6.8, 8.1, 7.2, 7.4, 6.9, 7.8]},
+            {"Sleep Duration": data["duration_history"]},
             height=200
         )
     
     with col2:
-        st.metric("Sleep Score", "85")
+        st.metric("Sleep Score", data["score"])
         st.line_chart(
-            {"Sleep Score": [85, 82, 88, 79, 86, 83, 87]},
+            {"Sleep Score": data["score_history"]},
             height=200
         )
     
     with col3:
-        st.metric("Deep Sleep", "1h 45m")
-        st.metric("REM Sleep", "1h 30m")
-        st.metric("Sleep Latency", "12 min")
-        st.metric("Sleep Efficiency", "92%")
+        display_metrics_column({
+            "Deep Sleep": data["deep_sleep"],
+            "REM Sleep": data["rem_sleep"],
+            "Sleep Latency": data["latency"],
+            "Sleep Efficiency": data["efficiency"]
+        })
 
-with tab2:
+def display_activity_tab(data: Dict) -> None:
+    """Render the activity metrics tab."""
     st.subheader("Activity Metrics")
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric("Daily Steps", "8,742")
+        st.metric("Daily Steps", data["steps"])
         st.bar_chart(
-            {"Steps": [8742, 10123, 7865, 9234, 8654, 11234, 9876]},
+            {"Steps": data["steps_history"]},
             height=200
         )
     
     with col2:
-        st.metric("Activity Score", "78")
+        st.metric("Activity Score", data["score"])
         st.line_chart(
-            {"Activity Score": [78, 82, 75, 80, 77, 85, 79]},
+            {"Activity Score": data["score_history"]},
             height=200
         )
     
     with col3:
-        st.metric("Calories Burned", "2,450")
-        st.metric("Walking Equivalent", "6.2 km")
-        st.metric("Training Frequency", "4/7 days")
-        st.metric("Movement", "85%")
+        display_metrics_column({
+            "Calories Burned": data["calories"],
+            "Walking Equivalent": data["walking_equiv"],
+            "Training Frequency": data["training_freq"],
+            "Movement": data["movement"]
+        })
 
-with tab3:
+def display_readiness_tab(data: Dict) -> None:
+    """Render the readiness metrics tab."""
     st.subheader("Readiness Metrics")
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric("HRV", "45 ms")
+        st.metric("HRV", data["hrv"])
         st.area_chart(
-            {"HRV": [45, 48, 42, 46, 44, 47, 43]},
+            {"HRV": data["hrv_history"]},
             height=200
         )
     
     with col2:
-        st.metric("Resting Heart Rate", "62 bpm")
+        st.metric("Resting Heart Rate", data["resting_hr"])
         st.line_chart(
-            {"Resting HR": [62, 60, 63, 61, 64, 62, 61]},
+            {"Resting HR": data["hr_history"]},
             height=200
         )
     
     with col3:
-        st.metric("Temperature Deviation", "+0.2°C")
-        st.metric("Recovery Index", "88")
-        st.metric("Body Battery", "75%")
-        st.metric("Respiratory Rate", "14 rpm")
+        display_metrics_column({
+            "Temperature Deviation": data["temp_deviation"],
+            "Recovery Index": data["recovery_index"],
+            "Body Battery": data["body_battery"],
+            "Respiratory Rate": data["respiratory_rate"]
+        })
+
+def main() -> None:
+    """Main application entry point."""
+    setup_page()
+    
+    # Create tabs for different graph categories
+    tab1, tab2, tab3 = st.tabs(["Sleep", "Activity", "Readiness"])
+    
+    with tab1:
+        display_sleep_tab(SAMPLE_DATA["sleep"])
+    
+    with tab2:
+        display_activity_tab(SAMPLE_DATA["activity"])
+    
+    with tab3:
+        display_readiness_tab(SAMPLE_DATA["readiness"])
+
+if __name__ == "__main__":
+    main()
