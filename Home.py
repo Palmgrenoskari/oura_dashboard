@@ -1,5 +1,9 @@
 from typing import List, Dict
 import streamlit as st
+from src.utils.api_client import fetch_daily_oura_data
+
+# Access secrets
+API_KEY = st.secrets["OURA_API_KEY"]
 
 # Configuration constants
 PAGE_TITLE = "Oura Dashboard"
@@ -141,6 +145,19 @@ def main() -> None:
     """Main application entry point."""
     setup_page()
     
+    sleep_data = fetch_daily_oura_data(API_KEY, "sleep")
+    activity_data = fetch_daily_oura_data(API_KEY, "activity")
+    readiness_data = fetch_daily_oura_data(API_KEY, "readiness")
+    
+    # Just inspect the raw data for now
+    st.text("Sleep Data:")
+    st.text(sleep_data)
+    st.text("Activity Data:") 
+    st.text(activity_data)
+    st.text("Readiness Data:")
+    st.text(readiness_data)
+    
+    st.header("Sample Data:")
     # Create tabs for different graph categories
     tab1, tab2, tab3 = st.tabs(["Sleep", "Activity", "Readiness"])
     
