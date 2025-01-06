@@ -1,6 +1,12 @@
 [theme]
-base = "dark"                  # Options: "light" (default) or "dark"
-primaryColor = "#1E88E5"       # Primary color
-backgroundColor = "#0E1117"    # Color for app background
-textColor = "#FFFFFF"          # Color for text
-font = "sans serif"
+# Base theme: dark theme works well for dashboards
+base = "dark"
+
+# Modern color palette
+primaryColor = "#FF4B4B"         # Vibrant red for key interactions and highlights
+secondaryBackgroundColor = "#1B2838"  # Slightly lighter than background for cards
+backgroundColor = "#0E1117"       # Dark background for better contrast
+textColor = "#FAFAFA"            # Slightly off-white for better readability
+
+# Font settings
+font = "sans serif"              # Clean, modern font
