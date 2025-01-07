@@ -1,6 +1,7 @@
 from typing import List, Dict
 import streamlit as st
-from src.utils.api_client import fetch_daily_oura_data
+from src.utils.api_client import fetch_oura_data
+from src.utils.data_processing import process_sleep_data
 
 # Access secrets
 API_KEY = st.secrets["OURA_API_KEY"]
@@ -145,17 +146,34 @@ def main() -> None:
     """Main application entry point."""
     setup_page()
     
-    sleep_data = fetch_daily_oura_data(API_KEY, "sleep")
-    activity_data = fetch_daily_oura_data(API_KEY, "activity")
-    readiness_data = fetch_daily_oura_data(API_KEY, "readiness")
+    sleep_data = process_sleep_data()
     
-    # Just inspect the raw data for now
-    st.text("Sleep Data:")
-    st.text(sleep_data)
-    st.text("Activity Data:") 
-    st.text(activity_data)
-    st.text("Readiness Data:")
-    st.text(readiness_data)
+    for day in sleep_data['data']:
+        st.header(day['id'])
+        st.text(day)
+        # st.text_input('average_breath', day['average_breath'])
+        # st.text_input('average_hr', day['average_heart_rate'])
+        # st.text_input('average_hrv', day['average_hrv'])
+        # st.text_input('awake_time', day['awake_time'])
+        # st.text_input('bedtime_end', day['bedtime_end'])
+        # st.text_input('bedtime_start', day['bedtime_start'])
+        # st.text_input('day', day['day'])
+        # st.text_input('deep_sleep_duration', day['deep_sleep_duration'])
+        # st.text_input('efficiency', day['efficiency'])
+        # st.text_input('latency', day['latency'])
+        # st.text_input('light_sleep_duration', day['light_sleep_duration'])
+        # st.text_input('low_battery_alert', day['low_battery_alert'])
+        # st.text_input('lowest_heart_rate', day['lowest_heart_rate'])
+        # st.text_input('period', day['period'])
+        # st.text_input('rem_sleep_duration', day['rem_sleep_duration'])
+        # st.text_input('restless_periods', day['restless_periods'])
+        # st.text_input('sleep_algorithm_version', day['sleep_algorithm_version'])
+        # st.text_input('time_in_bed', day['time_in_bed'])
+        # st.text_input('total_sleep_duration', day['total_sleep_duration'])
+        # st.text_input('type', day['type'])
+    
+    st.sidebar.header("Sidebar")
+    st.sidebar.text("This is the sidebar")
     
     st.header("Sample Data:")
     # Create tabs for different graph categories
