@@ -3,11 +3,9 @@ from src.utils.api_client import fetch_oura_data
 from datetime import datetime
 import pandas as pd
 
-API_KEY = st.secrets["OURA_API_KEY"]
-
 def process_sleep_data(api_key):
   
-  raw_data = fetch_oura_data(API_KEY, "sleep", 7)
+  raw_data = fetch_oura_data(api_key, "sleep", 7)
   data = raw_data['data']
   
   sleep_data = []
