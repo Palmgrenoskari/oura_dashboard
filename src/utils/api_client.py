@@ -28,7 +28,7 @@ def get_params(num_of_days):
             "end_date": yesterday.strftime("%Y-%m-%d")
         }
     
-    x_ago = yesterday - timedelta(days=num_of_days+1)
+    x_ago = yesterday - timedelta(days=num_of_days)
     return {
         "start_date": x_ago.strftime("%Y-%m-%d"),
         "end_date": yesterday.strftime("%Y-%m-%d")
