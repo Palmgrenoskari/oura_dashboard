@@ -5,7 +5,7 @@ import pandas as pd
 
 API_KEY = st.secrets["OURA_API_KEY"]
 
-def process_sleep_data():
+def process_sleep_data(api_key=API_KEY):
   
   raw_data = fetch_oura_data(API_KEY, "sleep", 7)
   data = raw_data['data']
