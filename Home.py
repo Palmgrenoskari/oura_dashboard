@@ -59,6 +59,11 @@ def main():
     tab1, tab2, tab3 = st.tabs(["Sleep","Activity","Readiness"])
     with tab1:
         display_sleep_tab()
+    with tab2:
+        st.info("In progress....")
+    with tab3:
+        st.info("In progress....")
+
     
 if __name__ == "__main__":
     main()
