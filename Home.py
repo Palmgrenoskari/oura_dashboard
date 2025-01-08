@@ -31,6 +31,110 @@ def get_api_key():
         return st.secrets["OURA_API_KEY"]
     return None
 
+def display_metric(title, icon, endpoint, data_path, unit=""):
+    try:
+        data = fetch_oura_data(st.session_state['api_key'], endpoint, 1)
+        value = data
+        for key in data_path:
+            value = value[key]
+            
+        # Create a custom container with CSS styling
+        with st.container():
+            st.markdown(f"""
+                <div style="
+                    background-color: {st.get_option('theme.secondaryBackgroundColor')};
+                    padding: 1rem;
+                    border-radius: 0.5rem;
+                    margin-bottom: 1rem;
+                    min-height: 120px;
+                    width: 100%;
+                ">
+                    <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">
+                        {icon} {title}
+                    </div>
+                    <div style="
+                        font-size: 2rem;
+                        font-weight: bold;
+                        color: {st.get_option('theme.primaryColor')};
+                    ">
+                        {value}{unit}
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+    except Exception as e:
+        with st.container():
+            st.markdown(f"""
+                <div style="
+                    background-color: {st.get_option('theme.secondaryBackgroundColor')};
+                    padding: 1rem;
+                    border-radius: 0.5rem;
+                    margin-bottom: 1rem;
+                    opacity: 0.7;
+                    min-height: 122px;
+                    width: 100%;
+                ">
+                    <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">
+                        {icon} {title}
+                    </div>
+                    <div style="color: #888888;">
+                        No data available
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+
+def overview_metrics():
+    
+    # Display overview metrics
+    st.header("Overview")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        display_metric(
+            "Sleep Score",
+            "😴",
+            "daily_sleep",
+            ['data', 0, 'score'],
+            "pts"
+        )
+        display_metric(
+            "Cardiovascular Age", 
+            "💙",
+            "daily_cardiovascular_age",
+            ['data', 0, 'vascular_age'],
+            " years"
+        )
+
+    with col2:
+        display_metric(
+            "Activity Score",
+            "🏃‍♂️",
+            "daily_activity",
+            ['data', 0, 'score'],
+            "pts"
+        )
+        display_metric(
+            "Resilience",
+            "💪",
+            "daily_resilience", 
+            ['data', 0, 'level']
+        )
+
+    with col3:
+        display_metric(
+            "Readiness Score",
+            "🎯",
+            "daily_readiness",
+            ['data', 0, 'score'],
+            "pts"
+        )
+        display_metric(
+            "Daily AVG SPO2",
+            "🩸", 
+            "daily_spo2",
+            ['data', 0, 'spo2_percentage', 'average'],
+            "%"
+        )
+
 def main():
     st.set_page_config(
         page_title=PAGE_TITLE,
@@ -45,115 +149,8 @@ def main():
     # Store API key in session state
     if api_key:
         st.session_state['api_key'] = api_key
-    
-        # Display overview metrics
-        st.header("Overview")
-        col1, col2, col3 = st.columns(3)
         
-        def display_metric(title, icon, endpoint, data_path, unit=""):
-            try:
-                data = fetch_oura_data(api_key, endpoint, 1)
-                value = data
-                for key in data_path:
-                    value = value[key]
-                    
-                # Create a custom container with CSS styling
-                with st.container():
-                    st.markdown(f"""
-                        <div style="
-                            background-color: {st.get_option('theme.secondaryBackgroundColor')};
-                            padding: 1rem;
-                            border-radius: 0.5rem;
-                            margin-bottom: 1rem;
-                            min-height: 120px;
-                            width: 100%;
-                        ">
-                            <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">
-                                {icon} {title}
-                            </div>
-                            <div style="
-                                font-size: 2rem;
-                                font-weight: bold;
-                                color: {st.get_option('theme.primaryColor')};
-                            ">
-                                {value}{unit}
-                            </div>
-                        </div>
-                    """, unsafe_allow_html=True)
-            except Exception as e:
-                with st.container():
-                    st.markdown(f"""
-                        <div style="
-                            background-color: {st.get_option('theme.secondaryBackgroundColor')};
-                            padding: 1rem;
-                            border-radius: 0.5rem;
-                            margin-bottom: 1rem;
-                            opacity: 0.7;
-                            min-height: 120px;
-                            width: 100%;
-                        ">
-                            <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">
-                                {icon} {title}
-                            </div>
-                            <div style="color: #888888;">
-                                No data available
-                            </div>
-                        </div>
-                    """, unsafe_allow_html=True)
-        
-        with col1:
-            display_metric(
-                "Sleep Score",
-                "😴",
-                "daily_sleep",
-                ['data', 0, 'score'],
-                "pts"
-            )
-            display_metric(
-                "Cardiovascular Age", 
-                "💙",
-                "daily_cardiovascular_age",
-                ['data', 0, 'vascular_age'],
-                " years"
-            )
-
-        with col2:
-            display_metric(
-                "Activity Score",
-                "🏃‍♂️",
-                "daily_activity",
-                ['data', 0, 'score'],
-                "pts"
-            )
-            display_metric(
-                "Resilience",
-                "💪",
-                "daily_resilience", 
-                ['data', 0, 'level']
-            )
-
-        with col3:
-            display_metric(
-                "Readiness Score",
-                "🎯",
-                "daily_readiness",
-                ['data', 0, 'score'],
-                "pts"
-            )
-            display_metric(
-                "Daily AVG SPO2",
-                "🩸", 
-                "daily_spo2",
-                ['data', 0, 'spo2_percentage', 'average'],
-                "%"
-            )
-        
-        st.markdown("""
-        ### Navigate to specific pages:
-        - **Sleep**: Detailed sleep analysis and trends
-        - **Activity**: Activity metrics and movement data
-        - **Extra**: Additional insights and analytics
-        """)
+        overview_metrics()
 
 if __name__ == "__main__":
     main()
