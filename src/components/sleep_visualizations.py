@@ -165,7 +165,7 @@ def display_sleep_charts(sleep_df):
         fig_hrv = px.line(
             y=hrv_data,
             x= [i*5 for i in range(len(hrv_data))],
-            title="HRV Throughout Sleep",
+            title="Heart Rate Variability Throughout Sleep",
             labels={'y': 'HRV (ms)', 'x': 'Time (5-min intervals)'}
         )
         st.plotly_chart(fig_hrv, use_container_width=True)

@@ -1,9 +1,6 @@
-from typing import List, Dict
 import streamlit as st
-import pandas as pd
 from src.utils.api_client import fetch_oura_data
 from src.utils.data_processing import process_sleep_data
-from src.components.sleep_visualizations import display_sleep_charts
 
 # Configuration constants
 PAGE_TITLE = "Oura Dashboard"
@@ -12,58 +9,59 @@ PAGE_DESCRIPTION = "Welcome to your personal health dashboard. Track your sleep,
 
 def get_api_key():
     """Get API key based on user selection."""
-    data_source = st.sidebar.radio(
+    data_source = st.radio(
         "Choose data source",
         ["Use demo data", "Connect Oura Ring"]
     )
     
     if data_source == "Connect Oura Ring":
-        user_api_key = st.sidebar.text_input(
+        user_api_key = st.text_input(
             "Enter your Oura API key",
             type="password",
-            help="You can find your API key in the Oura web dashboard"
+            help="You can find your API key in the Oura web dashboard",
+            key="api_key_input"
         )
-        return user_api_key if user_api_key else None
+        
+        if user_api_key:
+            st.success("API key successfully added! ✅")
+            return user_api_key
+        return None
+    elif data_source == "Use demo data":
+        return st.secrets["OURA_API_KEY"]
     return None
 
-def setup_page():
-    """Configure initial page settings."""
-    st.set_page_config(page_title=PAGE_TITLE, layout="wide")
+def main():
+    st.set_page_config(
+        page_title=PAGE_TITLE,
+        page_icon="💍",
+        layout="wide"
+    )
+    
     st.title(PAGE_HEADER)
     st.write(PAGE_DESCRIPTION)
-        
-def display_sleep_tab():
-    """Render the sleep metrics tab."""
+    
     api_key = get_api_key()
-    
+    # Store API key in session state
     if api_key:
-        # Use provided API key
-        sleep_data = process_sleep_data(api_key)
-        display_sleep_charts(sleep_data)
-    else:
-        # Use dummy data (to be implemented)
-        st.info("Using demo data")
-        sleep_data = process_sleep_data()
-        display_sleep_charts(sleep_data)
-
-def sleep_view():
-    sleep_data = process_sleep_data()
-    st.text(sleep_data)
-
-def main():
-    """Main application entry point."""
-    setup_page()
+        st.session_state['api_key'] = api_key
     
-    st.sidebar.header("Data Settings")
+    # Display overview metrics
+    st.header("Overview")
+    col1, col2, col3 = st.columns(3)
     
-    tab1, tab2, tab3 = st.tabs(["Sleep","Activity","Readiness"])
-    with tab1:
-        display_sleep_tab()
-    with tab2:
-        st.info("In progress....")
-    with tab3:
-        st.info("In progress....")
+    with col1:
+        st.info("Sleep Score", icon="😴")
+    with col2:
+        st.info("Activity Score", icon="🏃‍♂️")
+    with col3:
+        st.info("Readiness Score", icon="🎯")
+    
+    st.markdown("""
+    ### Navigate to specific pages:
+    - **Sleep**: Detailed sleep analysis and trends
+    - **Activity**: Activity metrics and movement data
+    - **Extra**: Additional insights and analytics
+    """)
 
-    
 if __name__ == "__main__":
     main()
