@@ -1,6 +1,7 @@
 import streamlit as st
 from src.utils.api_client import fetch_oura_data
 from src.utils.data_processing import process_sleep_data
+import time
 
 # Configuration constants
 PAGE_TITLE = "Oura Dashboard"
@@ -45,23 +46,43 @@ def main():
     if api_key:
         st.session_state['api_key'] = api_key
     
-    # Display overview metrics
-    st.header("Overview")
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.info("Sleep Score", icon="😴")
-    with col2:
-        st.info("Activity Score", icon="🏃‍♂️")
-    with col3:
-        st.info("Readiness Score", icon="🎯")
-    
-    st.markdown("""
-    ### Navigate to specific pages:
-    - **Sleep**: Detailed sleep analysis and trends
-    - **Activity**: Activity metrics and movement data
-    - **Extra**: Additional insights and analytics
-    """)
+        # Display overview metrics
+        st.header("Overview")
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.info("Sleep Score", icon="😴")
+            daily_sleep = fetch_oura_data(api_key, "daily_sleep", 1)
+            st.metric(
+                "Sleep Score", 
+                daily_sleep['data'][0]['score'],
+                delta_color="off"
+            )
+        with col2:
+            # TODO: Add activity score, currently hardcoded because API doesn't return it for some reason
+            st.info("Activity Score", icon="🏃‍♂️")
+            # daily_activity = fetch_oura_data(api_key, "daily_activity", 1)  
+            st.metric(
+                "Activity Score", 
+                # daily_activity['data'][0]['score'],
+                "80",
+                delta_color="off"
+            )
+        with col3:
+            st.info("Readiness Score", icon="🎯")
+            daily_readiness = fetch_oura_data(api_key, "daily_readiness", 1)
+            st.metric(
+                "Readiness Score", 
+                daily_readiness['data'][0]['score'],
+                delta_color="off"
+            )
+        
+        st.markdown("""
+        ### Navigate to specific pages:
+        - **Sleep**: Detailed sleep analysis and trends
+        - **Activity**: Activity metrics and movement data
+        - **Extra**: Additional insights and analytics
+        """)
 
 if __name__ == "__main__":
     main()
