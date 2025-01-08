@@ -1,5 +1,7 @@
 import streamlit as st
 from src.utils.api_client import fetch_oura_data
+from datetime import datetime
+import pandas as pd
 
 API_KEY = st.secrets["OURA_API_KEY"]
 
@@ -12,36 +14,33 @@ def process_sleep_data():
   
   for day in data:
     
+    # Convert timestamps to datetime objects
+    bedtime_start = datetime.fromisoformat(day['bedtime_start'])
+    bedtime_end = datetime.fromisoformat(day['bedtime_end'])
+    
+    # Convert durations from seconds to hours
     fields_of_interest = {
-      "average_breath": day['average_breath'],
+      "date": day['day'],
+      "deep_sleep": round(day['deep_sleep_duration'] / 3600, 2),
+      "light_sleep": round(day['light_sleep_duration'] / 3600, 2),
+      "rem_sleep": round(day['rem_sleep_duration'] / 3600, 2),
+      "total_sleep": round(day['total_sleep_duration'] / 3600, 2),
+      "time_in_bed": round(day['time_in_bed'] / 3600, 2),
+      "sleep_efficiency": day['efficiency'],
       "average_hr": day['average_heart_rate'],
       "average_hrv": day['average_hrv'],
-      "awake_time": day['awake_time'],
-      "bedtime_end": day['bedtime_end'],
-      "bedtime_start": day['bedtime_start'],
-      "date": day['day'],
+      "lowest_hr": day['lowest_heart_rate'],
       "hr_items": day['heart_rate']['items'],
       "hrv_items": day['hrv']['items'],
-      "time_in_bed": day['time_in_bed'],
-      "deep_sleep_duration": day['deep_sleep_duration'],
-      "light_sleep_duration": day['light_sleep_duration'],
-      "rem_sleep_duration": day['rem_sleep_duration'],
-      "total_sleep_duration": day['total_sleep_duration'],
-      "lowest_hr": day['lowest_heart_rate'],
-      "movement_30_sec": day['movement_30_sec'],
-      "efficiency": day['efficiency'],
-      "latency": day['latency'],
-      "restless_periods": day['restless_periods'],
-      "sleep_phase_5_min": day['sleep_phase_5_min'],
+      "bedtime_start": bedtime_start.strftime('%H:%M'),
+      "bedtime_end": bedtime_end.strftime('%H:%M'),
     }
     
     sleep_data.append(fields_of_interest)
     
+  # Convert to pandas DataFrame for easier visualization
+  return pd.DataFrame(sleep_data)
   
-  return sleep_data
-  
-  
-
 def process_activity_data(data):
   return data
 
