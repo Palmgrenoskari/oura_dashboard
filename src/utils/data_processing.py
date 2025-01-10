@@ -11,10 +11,16 @@ def process_sleep_data(api_key):
   sleep_data = []
   
   for day in data:
-    
     # Convert timestamps to datetime objects
     bedtime_start = datetime.fromisoformat(day['bedtime_start'])
     bedtime_end = datetime.fromisoformat(day['bedtime_end'])
+    
+    # Calculate total sleep duration in hours
+    total_sleep_hours = day['total_sleep_duration'] / 3600
+    
+    # Skip if sleep duration is less than 3 hours (likely a nap)
+    if total_sleep_hours < 3:
+      continue
     
     # Convert durations from seconds to hours
     fields_of_interest = {
@@ -22,7 +28,7 @@ def process_sleep_data(api_key):
       "deep_sleep": round(day['deep_sleep_duration'] / 3600, 2),
       "light_sleep": round(day['light_sleep_duration'] / 3600, 2),
       "rem_sleep": round(day['rem_sleep_duration'] / 3600, 2),
-      "total_sleep": round(day['total_sleep_duration'] / 3600, 2),
+      "total_sleep": round(total_sleep_hours, 2),
       "time_in_bed": round(day['time_in_bed'] / 3600, 2),
       "sleep_efficiency": day['efficiency'],
       "average_hr": day['average_heart_rate'],
