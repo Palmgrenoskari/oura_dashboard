@@ -13,7 +13,7 @@ def display_sleep_charts(sleep_df):
         latest = sleep_df.iloc[0]
         
         # Calculate weekly averages
-        weekly_avg = sleep_df.mean(numeric_only=True)
+        weekly_avg = sleep_df.tail(7).mean(numeric_only=True)
         
         # Calculate bedtime/waketime ranges
         bedtimes = pd.to_datetime(sleep_df['bedtime_start'], format='%H:%M').dt.time
@@ -149,14 +149,44 @@ def display_sleep_charts(sleep_df):
     # 4. Sleep Metrics Over Time
     with col2:
         st.subheader("Sleep Metrics Over Time")
-        fig_metrics = px.line(
+        fig_sleep_stages = px.line(
             sleep_df,
             x='date',
-            y='total_sleep',
-            title="Sleep Duration",
-            labels={'y': 'Hours', 'date': 'Date'}
+            y=['total_sleep', 'deep_sleep', 'light_sleep', 'rem_sleep'],
+            title="Sleep Stages Over Time",
+            labels={
+                'date': 'Date',
+                'value': 'Hours',
+                'variable': 'Sleep Stage'
+            },
+            color_discrete_map={
+                'total_sleep': '#6E78FF',    # Blue
+                'deep_sleep': '#FF6B6B',     # Red
+                'light_sleep': '#4CAF50',    # Green
+                'rem_sleep': '#FFC107'       # Yellow/Gold
+            }
         )
-        st.plotly_chart(fig_metrics, use_container_width=True)
+        
+        # Update the legend names
+        new_names = {
+            'total_sleep': 'Total Sleep',
+            'deep_sleep': 'Deep Sleep',
+            'light_sleep': 'Light Sleep',
+            'rem_sleep': 'REM Sleep'
+        }
+        fig_sleep_stages.for_each_trace(lambda t: t.update(name=new_names[t.name]))
+        
+        # Update y-axis to show ticks from 0 to 10
+        fig_sleep_stages.update_layout(
+            yaxis=dict(
+                tickmode='linear',
+                tick0=0,
+                dtick=2,
+                range=[0, 10]
+            )
+        )
+        
+        st.plotly_chart(fig_sleep_stages, use_container_width=True)
         
     # 5. HRV Timeline
     with col2:
@@ -169,3 +199,27 @@ def display_sleep_charts(sleep_df):
             labels={'y': 'HRV (ms)', 'x': 'Time (5-min intervals)'}
         )
         st.plotly_chart(fig_hrv, use_container_width=True)
+
+    # Add Average Heart Rate Over Time
+    with col1:
+        st.subheader("Average Heart Rate Over Time")
+        fig_avg_hr = px.line(
+            sleep_df,
+            x='date',
+            y='average_hr',
+            title="Average Heart Rate During Sleep",
+            labels={'y': 'Heart Rate (bpm)', 'date': 'Date'}
+        )
+        st.plotly_chart(fig_avg_hr, use_container_width=True)
+
+    # Add Lowest Heart Rate Over Time
+    with col2:
+        st.subheader("Lowest Heart Rate Over Time")
+        fig_lowest_hr = px.line(
+            sleep_df,
+            x='date',
+            y='lowest_hr',
+            title="Lowest Heart Rate During Sleep",
+            labels={'y': 'Heart Rate (bpm)', 'date': 'Date'}
+        )
+        st.plotly_chart(fig_lowest_hr, use_container_width=True)
