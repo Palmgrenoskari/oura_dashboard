@@ -68,12 +68,14 @@ def process_activity_data(api_key, days):
   
   for day in data:
     fields_of_interest = {
+      "date": day['day'],
       "score": day['score'],
       "active_calories": day['active_calories'],
       "average_met_minutes": day['average_met_minutes'],
       "equivalent_walking_distance": day['equivalent_walking_distance'],
       "met_items": day['met']['items'],
       "steps": day['steps'],
+      "target_meters": day['target_meters'],
       "target_calories": day['target_calories'],
       "total_calories": day['total_calories'],
     }
