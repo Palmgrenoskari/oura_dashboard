@@ -10,7 +10,7 @@ def display_sleep_charts(sleep_df):
     # 1. Sleep Metrics
     with col1:
         st.subheader("Sleep Metrics")
-        latest = sleep_df.iloc[0]
+        latest = sleep_df.iloc[-1]
         
         # Calculate weekly averages
         weekly_avg = sleep_df.tail(7).mean(numeric_only=True)
@@ -23,34 +23,42 @@ def display_sleep_charts(sleep_df):
         earliest_wake = min(waketimes).strftime('%H:%M')
         latest_wake = max(waketimes).strftime('%H:%M')
         
-        # Create metrics in a more visual way using st.metric
+        # Create metrics in a more visual way using custom HTML/CSS
         col1a, col1b, col1c = st.columns(3)
+        
+        def custom_metric(label, value, avg_text):
+            return f"""
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 1rem; margin-bottom: 0.2rem;">{label}</div>
+                    <div style="font-size: 1.5rem; font-weight: bold;">{value}</div>
+                    <div style="font-size: 0.8rem; color: #808495;">{avg_text}</div>
+                </div>
+            """
         
         with col1a:
             st.markdown("**🌙 Sleep Schedule**")
-            st.metric(
-                "Bedtime", 
+            st.markdown(custom_metric(
+                "Bedtime",
                 latest['bedtime_start'],
-                f"7 Day Range: {earliest_bed} - {latest_bed}",
-                delta_color="off"
-            )
-            st.metric(
-                "Wake time", 
+                f"7 Day Range: {earliest_bed} - {latest_bed}"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(custom_metric(
+                "Wake time",
                 latest['bedtime_end'],
-                f"7 Day Range: {earliest_wake} - {latest_wake}",
-                delta_color="off"
-            )
+                f"7 Day Range: {earliest_wake} - {latest_wake}"
+            ), unsafe_allow_html=True)
+            
             time_in_bed_hrs = int(latest['time_in_bed'])
             time_in_bed_mins = int((latest['time_in_bed'] - time_in_bed_hrs) * 60)
             avg_time_in_bed_hrs = int(weekly_avg['time_in_bed'])
             avg_time_in_bed_mins = int((weekly_avg['time_in_bed'] - avg_time_in_bed_hrs) * 60)
             
-            st.metric(
-                "Time in bed", 
+            st.markdown(custom_metric(
+                "Time in bed",
                 f"{time_in_bed_hrs}h {time_in_bed_mins}m",
-                f"7 Day Avg: {avg_time_in_bed_hrs}h {avg_time_in_bed_mins}m",
-                delta_color="off"
-            )
+                f"7 Day Avg: {avg_time_in_bed_hrs}h {avg_time_in_bed_mins}m"
+            ), unsafe_allow_html=True)
             
         with col1b:
             st.markdown("**📊 Sleep Stages**")
@@ -75,45 +83,43 @@ def display_sleep_charts(sleep_df):
             avg_total_sleep_hrs = int(weekly_avg['total_sleep'])
             avg_total_sleep_mins = int((weekly_avg['total_sleep'] - avg_total_sleep_hrs) * 60)
             
-            st.metric(
-                "Total sleep", 
+            st.markdown(custom_metric(
+                "Total sleep",
                 f"{total_sleep_hrs}h {total_sleep_mins}m",
-                f"7 Day Avg: {avg_total_sleep_hrs}h {avg_total_sleep_mins}m",
-                delta_color="off"
-            )
+                f"7 Day Avg: {avg_total_sleep_hrs}h {avg_total_sleep_mins}m"
+            ), unsafe_allow_html=True)
             
-            st.metric(
-                "Deep sleep", 
+            st.markdown(custom_metric(
+                "Deep sleep",
                 f"{deep_sleep_hrs}h {deep_sleep_mins}m",
-                f"7 Day Avg: {avg_deep_hrs}h {avg_deep_mins}m",
-                delta_color="off"
-            )
-            st.metric(
-                "Light sleep", 
+                f"7 Day Avg: {avg_deep_hrs}h {avg_deep_mins}m"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(custom_metric(
+                "Light sleep",
                 f"{light_sleep_hrs}h {light_sleep_mins}m",
-                f"7 Day Avg: {avg_light_hrs}h {avg_light_mins}m",
-                delta_color="off"
-            )
-            st.metric(
-                "REM sleep", 
+                f"7 Day Avg: {avg_light_hrs}h {avg_light_mins}m"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(custom_metric(
+                "REM sleep",
                 f"{rem_sleep_hrs}h {rem_sleep_mins}m",
-                f"7 Day Avg: {avg_rem_hrs}h {avg_rem_mins}m",
-                delta_color="off"
-            )
+                f"7 Day Avg: {avg_rem_hrs}h {avg_rem_mins}m"
+            ), unsafe_allow_html=True)
+            
         with col1c:
             st.markdown("**❤️ Heart Rate**")
-            st.metric(
-                "Average", 
+            st.markdown(custom_metric(
+                "Average",
                 f"{latest['average_hr']:.0f} bpm",
-                f"7 Day Avg: {weekly_avg['average_hr']:.0f} bpm",
-                delta_color="off"
-            )
-            st.metric(
-                "Lowest", 
-                f"{latest['lowest_hr']:.0f} bpm",
-                f"7 Day Avg: {weekly_avg['lowest_hr']:.0f} bpm",
-                delta_color="off"
-            )
+                f"7 Day Avg: {weekly_avg['average_hr']:.0f} bpm"
+            ), unsafe_allow_html=True)
+            
+            st.markdown(custom_metric(
+                "Lowest",
+                f"{latest['lowest_hr']:.0f} bpm", 
+                f"7 Day Avg: {weekly_avg['lowest_hr']:.0f} bpm"
+            ), unsafe_allow_html=True)
 
     # 3. Heart Rate Timeline
     with col1:
@@ -189,7 +195,7 @@ def display_sleep_charts(sleep_df):
         st.plotly_chart(fig_sleep_stages, use_container_width=True)
         
     # 5. HRV Timeline
-    with col2:
+    with col1:
         st.subheader("HRV During Sleep")
         hrv_data = [x for x in latest_sleep['hrv_items'] if x is not None]
         fig_hrv = px.line(
@@ -201,7 +207,7 @@ def display_sleep_charts(sleep_df):
         st.plotly_chart(fig_hrv, use_container_width=True)
 
     # Add Average Heart Rate Over Time
-    with col1:
+    with col2:
         st.subheader("Average Heart Rate Over Time")
         fig_avg_hr = px.line(
             sleep_df,
