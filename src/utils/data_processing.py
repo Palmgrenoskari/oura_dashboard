@@ -1,5 +1,5 @@
 import streamlit as st
-from src.utils.api_client import fetch_oura_data
+from src.utils.api_client import fetch_oura_data, fetch_daily_data
 from datetime import datetime
 import pandas as pd
 
@@ -51,10 +51,18 @@ def process_sleep_data(api_key, days):
 def process_activity_data(api_key, days):
   """
   Process activity data from the Oura API.
+  
+  Looks like using the start_date and end_date params in the fetch_oura_data function
+  always results in the current day being excluded.
+  
+  So we're going to do an extra fetch using fetch_daily_data to get today's data.
   """
   
   raw_data = fetch_oura_data(api_key, "daily_activity", days)
   data = raw_data['data']
+  
+  todays_data = fetch_daily_data(api_key, "daily_activity")
+  data.append(todays_data['data'][0])
   
   activity_data = []
   
