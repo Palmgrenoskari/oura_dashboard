@@ -13,7 +13,7 @@ In progress...
 
 <table>
 <tr>
-<td><img src="https://github.com/user-attachments/assets/952da5f3-b57d-4d00-a5b6-6e23c5b345f3" width="400"/></td>
+<td><img src="https://github.com/user-attachments/assets/444d4e81-68b8-455a-80ad-d6049dd7a952" width="400"/></td>
 <td><img src="https://github.com/user-attachments/assets/b78cc23f-5c65-481f-9d4b-b074e4e42411" width="400"/></td>
 </tr>
 </table>
