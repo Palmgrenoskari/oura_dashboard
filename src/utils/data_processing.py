@@ -48,8 +48,31 @@ def process_sleep_data(api_key, days):
   # Convert to pandas DataFrame for easier visualization
   return pd.DataFrame(sleep_data)
   
-def process_activity_data(data):
-  return data
+def process_activity_data(api_key, days):
+  """
+  Process activity data from the Oura API.
+  """
+  
+  raw_data = fetch_oura_data(api_key, "daily_activity", days)
+  data = raw_data['data']
+  
+  activity_data = []
+  
+  for day in data:
+    fields_of_interest = {
+      "score": day['score'],
+      "active_calories": day['active_calories'],
+      "average_met_minutes": day['average_met_minutes'],
+      "equivalent_walking_distance": day['equivalent_walking_distance'],
+      "met_items": day['met']['items'],
+      "steps": day['steps'],
+      "target_calories": day['target_calories'],
+      "total_calories": day['total_calories'],
+    }
+    
+    activity_data.append(fields_of_interest)
+    
+  return pd.DataFrame(activity_data)  
 
 def process_readiness_data(data):
   return data
