@@ -12,3 +12,5 @@ api_key = st.session_state.get('api_key', None)
 if api_key:
     sleep_data = process_sleep_data(api_key)
     display_sleep_charts(sleep_data)
+else:
+    st.info("Please go back to 'Home' page to connect your Oura Ring.")

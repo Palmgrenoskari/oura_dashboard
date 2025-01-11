@@ -1,5 +1,5 @@
 import streamlit as st
-from src.utils.api_client import fetch_oura_data
+from src.utils.api_client import fetch_oura_data, fetch_daily_data
 from src.utils.data_processing import process_sleep_data
 import time
 
@@ -33,7 +33,7 @@ def get_api_key():
 
 def display_metric(title, icon, endpoint, data_path, unit=""):
     try:
-        data = fetch_oura_data(st.session_state['api_key'], endpoint, 1)
+        data = fetch_daily_data(st.session_state['api_key'], endpoint)
         value = data
         for key in data_path:
             value = value[key]
