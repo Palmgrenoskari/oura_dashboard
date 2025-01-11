@@ -3,9 +3,12 @@ from src.utils.api_client import fetch_oura_data
 from datetime import datetime
 import pandas as pd
 
-def process_sleep_data(api_key):
+def process_sleep_data(api_key, days):
+  """
+  Process sleep data from the Oura API.
+  """
   
-  raw_data = fetch_oura_data(api_key, "sleep", 7)
+  raw_data = fetch_oura_data(api_key, "sleep", days)
   data = raw_data['data']
   
   sleep_data = []
