@@ -18,6 +18,18 @@ def process_sleep_data(api_key, day_count):
     bedtime_start = datetime.fromisoformat(day['bedtime_start'])
     bedtime_end = datetime.fromisoformat(day['bedtime_end'])
     
+    # Generate timestamps for each 5-minute interval
+    # This helps us later when plotting hr and hrv data against time
+    # Filter out None values from heart rate items
+    hr_items = [x for x in day['heart_rate']['items'] if x is not None]
+    hr_count = len(hr_items)
+    timestamps = []
+    current_time = bedtime_start
+    
+    for _ in range(hr_count):
+        timestamps.append(current_time.strftime('%H:%M'))
+        current_time = current_time + pd.Timedelta(minutes=5)
+    
     # Calculate total sleep duration in hours
     total_sleep_hours = day['total_sleep_duration'] / 3600
     
@@ -39,6 +51,7 @@ def process_sleep_data(api_key, day_count):
       "lowest_hr": day['lowest_heart_rate'],
       "hr_items": day['heart_rate']['items'],
       "hrv_items": day['hrv']['items'],
+      "timestamp_items": timestamps,
       "bedtime_start": bedtime_start.strftime('%H:%M'),
       "bedtime_end": bedtime_end.strftime('%H:%M'),
     }
