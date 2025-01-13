@@ -41,7 +41,9 @@ def load_data(endpoints, data_paths):
     all_data = []
     for i, endpoint in enumerate(endpoints):
         try:
-            data = fetch_oura_data(st.session_state['api_key'], endpoint)
+            data = fetch_daily_data(st.session_state['api_key'], endpoint)
+            if len(data['data']) == 0:
+                data = fetch_oura_data(st.session_state['api_key'], endpoint, 1)
             for key in data_paths[i]:
                 data = data[key]
             all_data.append(data)
