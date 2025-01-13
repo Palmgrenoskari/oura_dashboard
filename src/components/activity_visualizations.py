@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
 
 
 def display_activity_charts(activity_df, selected_day, start_date, end_date):
@@ -95,6 +96,40 @@ def display_activity_charts(activity_df, selected_day, start_date, end_date):
     # 3. Activity Metrics Over Time
     with col2:
         st.subheader("Activity Trends Over Time")
+        
+        
+        # Add new section for calories visualization
+        # TODO: Figure out the correct title/header size and make graph more pleasant to look at
+        st.subheader("Daily & Cumulative Active Calories")
+        
+        # Create figure with bar and line chart using plotly express
+        fig = px.bar(
+            date_range_activity_df,
+            x=date_range_activity_df.index,
+            y='active_calories',
+            title="Daily & Cumulative Active Calories",
+            labels={'active_calories': 'Daily Active Calories'},
+            color_discrete_sequence=['#4CAF50']
+        )
+
+        # Add cumulative line using plotly express
+        fig.add_scatter(
+            x=date_range_activity_df.index,
+            y=date_range_activity_df['active_calories'].cumsum(),
+            name='Cumulative Active Calories',
+            yaxis='y2',
+            line=dict(color='#2E6B94', width=2)
+        )
+
+        # Update layout
+        fig.update_layout(
+            yaxis2=dict(title='Cumulative Active Calories', overlaying='y', side='right'),
+            hovermode='x unified',
+            height=400,
+            margin=dict(l=20, r=20, t=20, b=20)
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
         
         # Steps over time
         fig_steps = px.line(
