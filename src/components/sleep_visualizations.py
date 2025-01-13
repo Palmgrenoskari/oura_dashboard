@@ -129,21 +129,32 @@ def display_sleep_charts(sleep_df, selected_day, start_date, end_date):
     with col1:
         st.subheader("Heart Rate During Sleep")
         hr_data = [x for x in selected_day_data['hr_items'] if x is not None]
+        timestamps = selected_day_data['timestamp_items']
         min_hr = min(hr_data)
         min_hr_index = hr_data.index(min_hr)
         
         # Create base line plot
         fig_hr = px.line(
             y=hr_data,
-            x= [i*5 for i in range(len(hr_data))],
+            x=timestamps,
             title="Heart Rate Throughout Sleep",
-            labels={'y': 'Heart Rate (bpm)', 'x': 'Time (5-min intervals)'}
+            labels={'y': 'Heart Rate (bpm)', 'x': 'Time'}
+        )
+        
+        # Customize x-axis to show fewer ticks
+        # Calculate number of ticks based on time in bed
+        time_in_bed = selected_day_data['time_in_bed'] # Already in hours
+        num_ticks = round(time_in_bed * 1.5) # 2 ticks per hour, rounded to nearest hour
+        
+        fig_hr.update_xaxes(
+            nticks=num_ticks,
+            tickangle=0
         )
         
         # Add scatter point for lowest HR
         fig_hr.add_trace(
             go.Scatter(
-                x=[min_hr_index*5],
+                x=[timestamps[min_hr_index]],
                 y=[min_hr],
                 mode='markers+text',
                 marker=dict(color='red', size=10),
@@ -203,10 +214,16 @@ def display_sleep_charts(sleep_df, selected_day, start_date, end_date):
         hrv_data = [x for x in selected_day_data['hrv_items'] if x is not None]
         fig_hrv = px.line(
             y=hrv_data,
-            x= [i*5 for i in range(len(hrv_data))],
+            x=timestamps,
             title="Heart Rate Variability Throughout Sleep",
-            labels={'y': 'HRV (ms)', 'x': 'Time (5-min intervals)'}
+            labels={'y': 'HRV (ms)', 'x': 'Time'}
         )
+        
+        fig_hrv.update_xaxes(
+            nticks=num_ticks,
+            tickangle=0
+        )
+        
         st.plotly_chart(fig_hrv, use_container_width=True)
 
     # Add Average Heart Rate Over Time
