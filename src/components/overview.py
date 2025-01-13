@@ -99,6 +99,14 @@ def display_metric(title, icon, value, unit="", metric_type="score"):
                 </div>
             """, unsafe_allow_html=True)
 
+def store_metrics(data):
+    st.session_state['sleep_score'] = data[0]
+    st.session_state['cardio_age'] = data[1]
+    st.session_state['activity_score'] = data[2]
+    st.session_state['resilience'] = data[3]
+    st.session_state['readiness_score'] = data[4]
+    st.session_state['average_spo2'] = data[5]
+
 def overview_metrics():
     
     # Display overview metrics
@@ -109,6 +117,8 @@ def overview_metrics():
         endpoints = ["daily_sleep", "daily_cardiovascular_age", "daily_activity", "daily_resilience", "daily_readiness", "daily_spo2"]
         data_paths = [['data', 0, 'score'], ['data', 0, 'vascular_age'], ['data', 0, 'score'], ['data', 0, 'level'], ['data', 0, 'score'], ['data', 0, 'spo2_percentage', 'average']]
         data = load_data(endpoints, data_paths)
+        # Store metrics for the LLM Chat
+        store_metrics(data)
         col1, col2, col3 = st.columns(3)
         with col1:
             display_metric(
