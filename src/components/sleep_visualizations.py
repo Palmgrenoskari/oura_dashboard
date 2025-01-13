@@ -3,23 +3,27 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-def display_sleep_charts(sleep_df):
+def display_sleep_charts(sleep_df, selected_day, start_date, end_date):
     # Create three columns
     col1, col2 = st.columns(2)
 
     # 1. Sleep Metrics
     with col1:
-        st.subheader("Sleep Metrics")
-        latest = sleep_df.iloc[-1]
-        
+        # Convert selected_day to string format to match DataFrame date format
+        selected_day_data = sleep_df[sleep_df['date'] == selected_day.strftime('%Y-%m-%d')].iloc[0] # Convert to Series instead of DF
+        date_range_sleep_df = sleep_df[(sleep_df['date'] >= start_date.strftime('%Y-%m-%d')) & (sleep_df['date'] <= end_date.strftime('%Y-%m-%d'))]
         # Calculate weekly averages
         weekly_avg = sleep_df.tail(7).mean(numeric_only=True)
         
         # Calculate bedtime/waketime ranges
-        bedtimes = pd.to_datetime(sleep_df['bedtime_start'], format='%H:%M').dt.time
-        waketimes = pd.to_datetime(sleep_df['bedtime_end'], format='%H:%M').dt.time
+        # Convert to datetime and handle times past midnight accordingly
+        bedtimes = pd.to_datetime(sleep_df.tail(7)['bedtime_start'], format='%H:%M')
+        bedtimes = bedtimes.apply(lambda x: x + pd.Timedelta(days=1) if x.hour < 12 else x)
+        waketimes = pd.to_datetime(sleep_df.tail(7)['bedtime_end'], format='%H:%M')
+        waketimes = waketimes.apply(lambda x: x + pd.Timedelta(days=1) if x.hour < 12 else x)
+        
         earliest_bed = min(bedtimes).strftime('%H:%M')
-        latest_bed = max(bedtimes).strftime('%H:%M') 
+        latest_bed = max(bedtimes).strftime('%H:%M')
         earliest_wake = min(waketimes).strftime('%H:%M')
         latest_wake = max(waketimes).strftime('%H:%M')
         
@@ -39,18 +43,18 @@ def display_sleep_charts(sleep_df):
             st.markdown("**🌙 Sleep Schedule**")
             st.markdown(custom_metric(
                 "Bedtime",
-                latest['bedtime_start'],
+                selected_day_data['bedtime_start'],
                 f"7 Day Range: {earliest_bed} - {latest_bed}"
             ), unsafe_allow_html=True)
             
             st.markdown(custom_metric(
                 "Wake time",
-                latest['bedtime_end'],
+                selected_day_data['bedtime_end'],
                 f"7 Day Range: {earliest_wake} - {latest_wake}"
             ), unsafe_allow_html=True)
             
-            time_in_bed_hrs = int(latest['time_in_bed'])
-            time_in_bed_mins = int((latest['time_in_bed'] - time_in_bed_hrs) * 60)
+            time_in_bed_hrs = int(selected_day_data['time_in_bed'])
+            time_in_bed_mins = int((selected_day_data['time_in_bed'] - time_in_bed_hrs) * 60)
             avg_time_in_bed_hrs = int(weekly_avg['time_in_bed'])
             avg_time_in_bed_mins = int((weekly_avg['time_in_bed'] - avg_time_in_bed_hrs) * 60)
             
@@ -63,12 +67,12 @@ def display_sleep_charts(sleep_df):
         with col1b:
             st.markdown("**📊 Sleep Stages**")
             # Convert sleep stages to hours and minutes for latest
-            deep_sleep_hrs = int(latest['deep_sleep'])
-            deep_sleep_mins = int((latest['deep_sleep'] - deep_sleep_hrs) * 60)
-            light_sleep_hrs = int(latest['light_sleep'])
-            light_sleep_mins = int((latest['light_sleep'] - light_sleep_hrs) * 60)
-            rem_sleep_hrs = int(latest['rem_sleep'])
-            rem_sleep_mins = int((latest['rem_sleep'] - rem_sleep_hrs) * 60)
+            deep_sleep_hrs = int(selected_day_data['deep_sleep'])
+            deep_sleep_mins = int((selected_day_data['deep_sleep'] - deep_sleep_hrs) * 60)
+            light_sleep_hrs = int(selected_day_data['light_sleep'])
+            light_sleep_mins = int((selected_day_data['light_sleep'] - light_sleep_hrs) * 60)
+            rem_sleep_hrs = int(selected_day_data['rem_sleep'])
+            rem_sleep_mins = int((selected_day_data['rem_sleep'] - rem_sleep_hrs) * 60)
             
             # Convert sleep stages to hours and minutes for weekly average
             avg_deep_hrs = int(weekly_avg['deep_sleep'])
@@ -78,8 +82,8 @@ def display_sleep_charts(sleep_df):
             avg_rem_hrs = int(weekly_avg['rem_sleep'])
             avg_rem_mins = int((weekly_avg['rem_sleep'] - avg_rem_hrs) * 60)
             
-            total_sleep_hrs = int(latest['total_sleep'])
-            total_sleep_mins = int((latest['total_sleep'] - total_sleep_hrs) * 60)
+            total_sleep_hrs = int(selected_day_data['total_sleep'])
+            total_sleep_mins = int((selected_day_data['total_sleep'] - total_sleep_hrs) * 60)
             avg_total_sleep_hrs = int(weekly_avg['total_sleep'])
             avg_total_sleep_mins = int((weekly_avg['total_sleep'] - avg_total_sleep_hrs) * 60)
             
@@ -111,21 +115,20 @@ def display_sleep_charts(sleep_df):
             st.markdown("**❤️ Heart Rate**")
             st.markdown(custom_metric(
                 "Average",
-                f"{latest['average_hr']:.0f} bpm",
+                f"{selected_day_data['average_hr']:.0f} bpm",
                 f"7 Day Avg: {weekly_avg['average_hr']:.0f} bpm"
             ), unsafe_allow_html=True)
             
             st.markdown(custom_metric(
                 "Lowest",
-                f"{latest['lowest_hr']:.0f} bpm", 
+                f"{selected_day_data['lowest_hr']:.0f} bpm", 
                 f"7 Day Avg: {weekly_avg['lowest_hr']:.0f} bpm"
             ), unsafe_allow_html=True)
 
     # 3. Heart Rate Timeline
     with col1:
         st.subheader("Heart Rate During Sleep")
-        latest_sleep = sleep_df.iloc[0]
-        hr_data = [x for x in latest_sleep['hr_items'] if x is not None]
+        hr_data = [x for x in selected_day_data['hr_items'] if x is not None]
         min_hr = min(hr_data)
         min_hr_index = hr_data.index(min_hr)
         
@@ -156,7 +159,7 @@ def display_sleep_charts(sleep_df):
     with col2:
         st.subheader("Sleep Metrics Over Time")
         fig_sleep_stages = px.line(
-            sleep_df,
+            date_range_sleep_df,
             x='date',
             y=['total_sleep', 'deep_sleep', 'light_sleep', 'rem_sleep'],
             title="Sleep Stages Over Time",
@@ -197,7 +200,7 @@ def display_sleep_charts(sleep_df):
     # 5. HRV Timeline
     with col1:
         st.subheader("HRV During Sleep")
-        hrv_data = [x for x in latest_sleep['hrv_items'] if x is not None]
+        hrv_data = [x for x in selected_day_data['hrv_items'] if x is not None]
         fig_hrv = px.line(
             y=hrv_data,
             x= [i*5 for i in range(len(hrv_data))],
@@ -210,7 +213,7 @@ def display_sleep_charts(sleep_df):
     with col2:
         st.subheader("Average Heart Rate Over Time")
         fig_avg_hr = px.line(
-            sleep_df,
+            date_range_sleep_df,
             x='date',
             y='average_hr',
             title="Average Heart Rate During Sleep",
@@ -222,7 +225,7 @@ def display_sleep_charts(sleep_df):
     with col2:
         st.subheader("Lowest Heart Rate Over Time")
         fig_lowest_hr = px.line(
-            sleep_df,
+            date_range_sleep_df,
             x='date',
             y='lowest_hr',
             title="Lowest Heart Rate During Sleep",
