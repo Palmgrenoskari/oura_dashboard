@@ -18,9 +18,9 @@ def main():
         layout="wide"
     )
     
+    st.info(DISCLAIMER)
     st.title(PAGE_HEADER)
     st.write(PAGE_DESCRIPTION)
-    st.caption(DISCLAIMER)
     
     api_key = get_api_key()
     # Store API key in session state
