@@ -210,7 +210,6 @@ def display_sleep_charts(sleep_df, selected_day, start_date, end_date):
         
     # 5. HRV Timeline
     with col1:
-        st.subheader("HRV During Sleep")
         hrv_data = [x for x in selected_day_data['hrv_items'] if x is not None]
         fig_hrv = px.line(
             y=hrv_data,
@@ -228,7 +227,6 @@ def display_sleep_charts(sleep_df, selected_day, start_date, end_date):
 
     # Add Average Heart Rate Over Time
     with col2:
-        st.subheader("Average Heart Rate Over Time")
         fig_avg_hr = px.line(
             date_range_sleep_df,
             x='date',
@@ -240,7 +238,6 @@ def display_sleep_charts(sleep_df, selected_day, start_date, end_date):
 
     # Add Lowest Heart Rate Over Time
     with col2:
-        st.subheader("Lowest Heart Rate Over Time")
         fig_lowest_hr = px.line(
             date_range_sleep_df,
             x='date',
