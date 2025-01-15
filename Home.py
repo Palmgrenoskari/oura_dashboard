@@ -18,8 +18,8 @@ def main():
         layout="wide"
     )
     
-    st.info(DISCLAIMER)
     st.title(PAGE_HEADER)
+    st.info(DISCLAIMER)
     st.write(PAGE_DESCRIPTION)
     
     api_key = get_api_key()
