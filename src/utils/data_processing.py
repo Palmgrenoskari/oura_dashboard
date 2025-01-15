@@ -99,3 +99,9 @@ def process_activity_data(api_key, days):
 
 def process_readiness_data(data):
   return data
+
+def load_activity_data():
+  return pd.read_parquet('src/data/activity_data.parquet')
+
+def load_sleep_data():
+  return pd.read_parquet('src/data/sleep_data.parquet')

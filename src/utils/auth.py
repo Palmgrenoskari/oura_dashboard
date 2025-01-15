@@ -20,5 +20,5 @@ def get_api_key():
             return user_api_key
         return None
     elif data_source == "Use demo data":
-        return st.secrets["OURA_API_KEY"]
+        return None
     return None
