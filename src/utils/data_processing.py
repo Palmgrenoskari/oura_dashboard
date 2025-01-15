@@ -22,6 +22,7 @@ def process_sleep_data(api_key, day_count):
     # This helps us later when plotting hr and hrv data against time
     # Filter out None values from heart rate items
     hr_items = [x for x in day['heart_rate']['items'] if x is not None]
+    hrv_items = [x for x in day['hrv']['items'] if x is not None]
     hr_count = len(hr_items)
     timestamps = []
     current_time = bedtime_start
@@ -49,8 +50,8 @@ def process_sleep_data(api_key, day_count):
       "average_hr": day['average_heart_rate'],
       "average_hrv": day['average_hrv'],
       "lowest_hr": day['lowest_heart_rate'],
-      "hr_items": day['heart_rate']['items'],
-      "hrv_items": day['hrv']['items'],
+      "hr_items": hr_items,
+      "hrv_items": hrv_items,
       "timestamp_items": timestamps,
       "bedtime_start": bedtime_start.strftime('%H:%M'),
       "bedtime_end": bedtime_end.strftime('%H:%M'),
