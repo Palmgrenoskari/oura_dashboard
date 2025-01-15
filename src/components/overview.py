@@ -31,6 +31,13 @@ def get_color_code(value, metric_type):
         if age_diff > -1 and age_diff < 1: return "#FFD700"  # Neutral
         if age_diff > -3: return "#98FB98"  # Good
         return "#32CD32"  # Great
+    
+    elif metric_type == "resilience":
+        if value == "limited": return "#FF4B4B"  # Bad
+        if value == "adequate": return "#FFA07A"  # Slightly bad
+        if value == "solid": return "#FFD700"  # Neutral
+        if value == "strong": return "#98FB98"  # Good
+        return "#32CD32"  # Great
         
     return st.get_option('theme.primaryColor')
 
@@ -149,7 +156,7 @@ def overview_metrics():
                 "💪",
                 data[3],
                 " level",
-                "score"
+                "resilience"
             )
 
         with col3:
