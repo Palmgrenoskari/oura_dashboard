@@ -1,4 +1,5 @@
 import streamlit as st
+import json
 from src.utils.api_client import fetch_daily_data, fetch_oura_data
 
 def store_age():
@@ -114,63 +115,87 @@ def store_metrics(data):
     st.session_state['readiness_score'] = data[4]
     st.session_state['average_spo2'] = data[5]
 
-def overview_metrics():
-    
-    # Display overview metrics
+def show_metrics(data):
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        display_metric(
+            "Sleep Score",
+            "😴",
+            data[0],
+            "pts",
+            "score"
+        )
+        display_metric(
+            "Cardiovascular Age", 
+            "💙",
+            data[1],
+            " years",
+            "cardio_age"
+        )
+
+    with col2:
+        display_metric(
+            "Activity Score",
+            "🏃‍♂️",
+            data[2],
+            "pts",
+            "score"
+        )
+        display_metric(
+            "Resilience",
+            "💪",
+            data[3],
+            "",
+            "resilience"
+        )
+
+    with col3:
+        display_metric(
+            "Readiness Score",
+            "🎯",
+            data[4],
+            "pts",
+            "score"
+        )
+        display_metric(
+            "Daily AVG SPO2",
+            "🩸", 
+            data[5],
+            "%",
+            "spo2"
+        )
+        
+def overview_metrics(api_key = True):
     st.header("Overview")
-    with st.spinner("Fetching your latest data..."):
-        # Store age to compare to cardiovascular age
-        store_age()
-        endpoints = ["daily_sleep", "daily_cardiovascular_age", "daily_activity", "daily_resilience", "daily_readiness", "daily_spo2"]
-        data_paths = [['data', 0, 'score'], ['data', 0, 'vascular_age'], ['data', 0, 'score'], ['data', 0, 'level'], ['data', 0, 'score'], ['data', 0, 'spo2_percentage', 'average']]
-        data = load_data(endpoints, data_paths)
-        # Store metrics for the LLM Chat
-        store_metrics(data)
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            display_metric(
-                "Sleep Score",
-                "😴",
-                data[0],
-                "pts",
-                "score"
-            )
-            display_metric(
-                "Cardiovascular Age", 
-                "💙",
-                data[1],
-                " years",
-                "cardio_age"
-            )
-
-        with col2:
-            display_metric(
-                "Activity Score",
-                "🏃‍♂️",
-                data[2],
-                "pts",
-                "score"
-            )
-            display_metric(
-                "Resilience",
-                "💪",
-                data[3],
-                " level",
-                "resilience"
-            )
-
-        with col3:
-            display_metric(
-                "Readiness Score",
-                "🎯",
-                data[4],
-                "pts",
-                "score"
-            )
-            display_metric(
-                "Daily AVG SPO2",
-                "🩸", 
-                data[5],
-                "%",
-                "spo2"
-            )
+    if api_key:
+        with st.spinner("Fetching your latest data..."):
+            # Store age to compare to cardiovascular age
+            store_age()
+            # Load data from Oura API
+            endpoints = ["daily_sleep", "daily_cardiovascular_age", "daily_activity", "daily_resilience", "daily_readiness", "daily_spo2"]
+            data_paths = [['data', 0, 'score'], ['data', 0, 'vascular_age'], ['data', 0, 'score'], ['data', 0, 'level'], ['data', 0, 'score'], ['data', 0, 'spo2_percentage', 'average']]
+            data = load_data(endpoints, data_paths)
+            # Store metrics for the LLM Chat
+            store_metrics(data)
+            # Display metrics
+            show_metrics(data)
+    else:
+        with st.spinner("Loading demo data..."):
+            # Store age for cardiovascular age comparison
+            st.session_state['age'] = 27
+            # Load data from json
+            with open('src/data/overview_metrics.json', 'r') as f:
+                data = json.load(f)
+            # Convert json into list
+            metrics_data = [
+                data['daily_sleep_score'],
+                data['daily_cardiovascular_age'], 
+                data['daily_activity_score'],
+                data['daily_resilience'],
+                data['daily_readiness_score'],
+                data['daily_spo2_percentage']
+            ]
+            # Store metrics for the LLM Chat
+            store_metrics(metrics_data)
+            # Display metrics
+            show_metrics(metrics_data)

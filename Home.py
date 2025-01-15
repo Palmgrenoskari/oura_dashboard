@@ -27,6 +27,8 @@ def main():
     if api_key:
         st.session_state['api_key'] = api_key
         overview_metrics()
+    else:
+        overview_metrics(False)
 
 if __name__ == "__main__":
     main()
