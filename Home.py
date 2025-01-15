@@ -8,6 +8,7 @@ from src.components.overview import overview_metrics
 PAGE_TITLE = "Oura Dashboard"
 PAGE_HEADER = "Personal Health Analytics"
 PAGE_DESCRIPTION = "Welcome to your personal health dashboard. Track your sleep, activity, and readiness metrics from your Oura Ring."
+DISCLAIMER = "🚧 Note! This is an MVP (minimum viable product). Expect bugs and incomplete features. 🚧"
 
 
 def main():
@@ -19,6 +20,7 @@ def main():
     
     st.title(PAGE_HEADER)
     st.write(PAGE_DESCRIPTION)
+    st.caption(DISCLAIMER)
     
     api_key = get_api_key()
     # Store API key in session state
