@@ -61,7 +61,59 @@ if prompt := st.chat_input("What would you like to know?"):
             st.write(response.text)
     st.session_state.messages.append({"role": "assistant", "content": response.text})
 
-# Add a clear chat button
-if st.sidebar.button("Clear Chat"):
-    st.session_state.messages = []
-    st.rerun()
+# Sidebar options
+with st.sidebar:
+    st.title("Chat Options")
+    
+    # Create a container for buttons with equal width
+    button_container = st.container()
+    
+    # Custom styling for buttons
+    button_style = """
+        <style>
+        div.stButton > button {
+            width: 100%;
+            height: 50px;
+            margin: 0px;
+        }
+        div.stDownloadButton > button {
+            width: 100%;
+            height: 50px;
+            margin: 0px;
+            background-color: #98FB98 !important;
+            color: black !important;
+            border: none !important;
+        }
+        div.stDownloadButton > button:hover {
+            background-color: #7FCD7F !important;
+            color: black !important;
+        }
+        </style>
+    """
+    st.markdown(button_style, unsafe_allow_html=True)
+    
+    col1, col2 = button_container.columns([1, 1])
+    with col1:
+        if st.button("Clear Chat", 
+                     type="primary",
+                     use_container_width=True,
+                     key="clear_chat"):
+            st.session_state.messages = []
+            st.rerun()
+    with col2:
+        # Convert to String for .txt file
+        conversation_text = ""
+        for message in st.session_state.messages:   
+            role = message["role"].capitalize()
+            content = message["content"]
+            conversation_text += f"{role}: {content}\n\n"
+                
+        st.download_button(
+            label="Download",
+            data=conversation_text,
+            file_name="conversation_history.txt",
+            mime="text/plain",
+            use_container_width=True,
+            key="download_chat"
+        )
+
