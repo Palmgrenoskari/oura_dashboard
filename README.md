@@ -8,10 +8,11 @@ If you own an Oura Ring, you can enhance your experience by using your own data.
 ---
 
 TO DO:
-1) Better and more graphs, charts and infographics
-2) Login system to store your API
-3) Optimizations
-4) Webhooks? Oura API does have webhook support but not sure if Oura updates your data frequently enough for some kind of live dashboard
+1) Error handling for cases of incomplete data
+2) Better and more graphs, charts and infographics
+3) Login system to store your API
+4) Optimizations
+5) Webhooks? Oura API does have webhook support but not sure if Oura updates your data frequently enough for some kind of live dashboard
 
 ---
 ## Current pages
